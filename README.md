@@ -49,4 +49,4 @@ Activation functions
 
 
 ### Remarks
-This model is clearly over-fitting
+This model is clearly over-fitting and seems to be pretty inconsistent
