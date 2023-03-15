@@ -1,12 +1,33 @@
 import numpy as np
 import h5py
 
+def load_dataset():
+
+    train_dataset = h5py.File('datasets/train_catvnoncat.h5', "r")
+    train_set_x_orig = np.array(train_dataset["train_set_x"][:])  # your train set features
+    train_set_y_orig = np.array(train_dataset["train_set_y"][:])  # your train set labels
+
+    test_dataset = h5py.File('datasets/test_catvnoncat.h5', "r")
+    test_set_x_orig = np.array(test_dataset["test_set_x"][:])  # your test set features
+    test_set_y_orig = np.array(test_dataset["test_set_y"][:])  # your test set labels
+
+    classes = np.array(test_dataset["list_classes"][:])  # the list of classes
+
+    train_set_y_orig = train_set_y_orig.reshape((1, train_set_y_orig.shape[0]))
+    test_set_y_orig = test_set_y_orig.reshape((1, test_set_y_orig.shape[0]))
+
+    return train_set_x_orig, train_set_y_orig, test_set_x_orig, test_set_y_orig, classes
+
+def reshape(image_dataset):
+    return image_dataset.reshape(image_dataset.shape[0], -1).T / 255
+
+
 def initialize_parameters(x_size,hidden_size,output_size):
 
     W1 = np.random.randn(hidden_size, x_size) * 0.01
-    b1 = np.zeros(hidden_size, 1)
+    b1 = np.zeros((hidden_size, 1))
     W2 = np.random.randn(output_size, hidden_size) * 0.01
-    b2 = np.zeros(output_size, 1)
+    b2 = np.zeros((output_size, 1))
 
     return W1, b1, W2, b2
 
@@ -44,10 +65,10 @@ def linear_activation_forward(previous_A, W, b, activation):
 
     return A, cache
 
-def compute_cost(AL, Y):
+def compute_cost(A2, Y):
 
     m = Y.shape[1]
-    cost = -1/m * np.sum(Y * np.log(AL) + (1-Y) * np.log(1-AL))
+    cost = -1/m * np.sum(Y * np.log(A2) + (1-Y) * np.log(1-A2))
 
     # cost = np.squeeze(cost)
 
@@ -83,7 +104,7 @@ def linear_activation_backward(dA, cache, activation):
 
     linear_cache, activation_cache = cache
 
-    if activation == "signoid":
+    if activation == "sigmoid":
         dZ = sigmoid_backward(dA, activation_cache)
         dprevious_A, dW, db = linear_backward(dZ, linear_cache)
 
@@ -100,8 +121,57 @@ def update_parameters(W1, b1, W2, b2, dW1, db1, dW2, db2,  learning_rate):
 
     W2 = W2 - learning_rate * dW2
     b2 = b2 - learning_rate * db2
+    return W1, b1, W2, b2
+
+def predict (W1, b1, W2, b2, X, Y):
+
+    A1, cache1 = linear_activation_forward(X, W1, b1, "relu")
+    A2, cache2 = linear_activation_forward(A1, W2, b2, "sigmoid")
+
+    Y_prediction = np.zeros((1, Y.shape[1]))
+
+    for i in range(Y.shape[1]):
+        if A2[0, i] > 0.5:
+            Y_prediction[0, i] = 1
+        else:
+            Y_prediction[0, i] = 0
+
+    print("Accuracy: " + str(np.sum((Y_prediction == Y) / Y.shape[1])))
+
+def model(train_set_picture, train_set_label, test_set_picture, test_set_label, layers_dims, num_itterations, learning_rate):
+
+    costs = []
+    x_size, hidden_size, output_size = layers_dims
+    W1, b1, W2, b2 = initialize_parameters(x_size, hidden_size, output_size)
+
+    for i in range(0,num_itterations):
+        A1, cache1 = linear_activation_forward(train_set_picture,W1,b1,"relu")
+        A2,cache2 = linear_activation_forward(A1, W2, b2, "sigmoid")
+        cost = compute_cost(A2, train_set_label)
+
+        # Noter !
+        dA2 = -(np.divide(train_set_label, A2) - np.divide(1-train_set_label, 1-A2))
+        dA1, dW2, db2 = linear_activation_backward(dA2, cache2, "sigmoid")
+        dA0, dW1, db1 = linear_activation_backward(dA1, cache1, "relu")
+
+        W1, b1, W2, b2 = update_parameters(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate)
+
+        if i % 100 == 0:
+            print(f"Cost after {i} itterations : {cost}")
+            costs.append(cost)
 
     return W1, b1, W2, b2
+if __name__ == '__main__':
+    train_set_picture, train_set_label, test_set_picture, test_set_label, classes = load_dataset()
+
+    train_set_picture = reshape(train_set_picture)
+    test_set_picture = reshape(test_set_picture)
+
+    layers_dims = [train_set_picture.shape[0], 7, 1]
+
+    W1, b1, W2, b2 = model(train_set_picture, train_set_label, test_set_picture, test_set_label, layers_dims, 2000, 0.005)
+    predict(W1, b1, W2, b2, train_set_picture, train_set_label)
+    predict(W1, b1, W2, b2, test_set_picture, test_set_label)
 
 
 

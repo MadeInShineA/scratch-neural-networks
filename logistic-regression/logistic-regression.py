@@ -20,7 +20,7 @@ def load_dataset():
 
 
 def reshape(image_dataset):
-    return image_dataset.reshape(image_dataset.shape[0],-1).T / 255
+    return image_dataset.reshape(image_dataset.shape[0], -1).T / 255
 
 
 def sigmoid(z):
