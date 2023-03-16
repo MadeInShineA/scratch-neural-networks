@@ -73,6 +73,35 @@ def compute_cost(AL, Y):
 
 def linear_backward(dZ, cache):
 
+    previous_A, W, b = cache
+    m = np.shape(previous_A)[1]
+
+    dW = 1 / m * np.dot(dZ, previous_A.T)
+    db = 1 / m * np.sum(dZ, axis=1, keepdims=True)
+    dprevious_A = np.dot(W.T, dZ)
+
+    return dprevious_A, dW, db
+
+
+def sigmoid_backward(dA, cache):
+
+    Z = cache
+    s = 1/(1+np.exp(-Z))
+    dZ = dA * s * (1-s)
+
+    return dZ
+
+
+def relu_backward(dA, cache):
+
+    Z = cache
+    dZ = np.array(dA, copy=True)
+    dZ[Z <= 0] = 0
+
+    return dZ
+
+
+
 
 
 if __name__ == '__main__':

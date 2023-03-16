@@ -71,6 +71,7 @@ def sigmoid_backward(dA, cache):
 
     return dZ
 
+
 def relu_backward(dA, cache):
 
     Z = cache
@@ -78,6 +79,8 @@ def relu_backward(dA, cache):
     dZ[Z <= 0] = 0
 
     return dZ
+
+
 def linear_activation_backward(dA, cache, activation):
 
     linear_cache, activation_cache = cache
@@ -92,6 +95,7 @@ def linear_activation_backward(dA, cache, activation):
 
     return dprevious_A, dW, db
 
+
 def update_parameters(W1, b1, W2, b2, dW1, db1, dW2, db2,  learning_rate):
 
     W1 = W1 - learning_rate * dW1
@@ -100,6 +104,7 @@ def update_parameters(W1, b1, W2, b2, dW1, db1, dW2, db2,  learning_rate):
     W2 = W2 - learning_rate * dW2
     b2 = b2 - learning_rate * db2
     return W1, b1, W2, b2
+
 
 def predict (W1, b1, W2, b2, X, Y):
 
@@ -116,7 +121,8 @@ def predict (W1, b1, W2, b2, X, Y):
 
     print("Accuracy: " + str(np.sum((Y_prediction == Y) / Y.shape[1])))
 
-def model(train_set_picture, train_set_label, test_set_picture, test_set_label, layers_dims, num_itterations, learning_rate):
+
+def model(train_set_picture, train_set_label, layers_dims, num_itterations, learning_rate):
 
     costs = []
     x_size, hidden_size, output_size = layers_dims
@@ -139,6 +145,8 @@ def model(train_set_picture, train_set_label, test_set_picture, test_set_label, 
             costs.append(cost)
 
     return W1, b1, W2, b2
+
+
 if __name__ == '__main__':
     train_set_picture, train_set_label, test_set_picture, test_set_label, classes = load_dataset()
 
@@ -147,7 +155,7 @@ if __name__ == '__main__':
 
     layers_dims = [train_set_picture.shape[0], 7, 1]
 
-    W1, b1, W2, b2 = model(train_set_picture, train_set_label, test_set_picture, test_set_label, layers_dims, 2000, 0.005)
+    W1, b1, W2, b2 = model(train_set_picture, train_set_label, layers_dims, 2000, 0.005)
     predict(W1, b1, W2, b2, train_set_picture, train_set_label)
     predict(W1, b1, W2, b2, test_set_picture, test_set_label)
 
