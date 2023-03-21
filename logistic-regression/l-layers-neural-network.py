@@ -5,9 +5,9 @@ from utils import *
 def initialize_parameters(layers_size):
 
     parameters = {}
-    for i in range(1,layers_size):
+    for i in range(1,len(layers_size)):
         W = np.random.randn(layers_size[i],layers_size[i - 1]) * 0.01
-        b = np.zeros((layers_size, 1))
+        b = np.zeros((layers_size[i], 1))
 
         parameters['W'+str(i)] = W
         parameters['b'+str(i)] = b
@@ -33,33 +33,37 @@ def sigmoid(Z):
 
 def relu(Z):
 
-    A = np.max(Z, 0)
+    A = np.maximum(0, Z)
 
     cache = Z
 
     return A, cache
 
 
-def linear_forward_activation(A, W, b, L):
+def linear_forward_activation(X, parameters):
 
-    cache = {}
+    forward_cache = {}
+    A = X
+    L = len(parameters) // 2
 
-    for i in range(0, L-1):
-        Z, linear_cache = linear_forward(A, W, b)
-        A, activation_cache = sigmoid(Z)
+    for i in range(1, L):
+        Z, linear_cache = linear_forward(A, parameters['W'+str(i)], parameters['b'+str(i)])
+        A, activation_cache = relu(Z)
 
-        cache['linear_cache'+str(i)] = linear_cache
-        cache['activation_cache' + str(i)] = activation_cache
-        cache['Z'+str(i)] = Z
-        cache['A' + str(i)] = A
+        forward_cache['linear_cache'+str(i)] = linear_cache
+        forward_cache['activation_cache' + str(i)] = activation_cache
+        #cache['Z'+str(i)] = Z
+        #forward_cache['A' + str(i)] = A
 
 
-    ZL, linear_cache = linear_forward(A, W, b)
+    ZL, linear_cache = linear_forward(A, parameters['W'+str(L)], parameters['b'+str(L)])
     AL, activation_cache = sigmoid(ZL)
 
-    cache['ZL'] = ZL
+    forward_cache['linear_cache'+str(L)] = linear_cache
+    forward_cache['activation_cache'+str(L)] = activation_cache
 
-    return AL, cache
+
+    return AL, forward_cache
 
 def compute_cost(AL, Y):
 
@@ -100,17 +104,24 @@ def relu_backward(dA, cache):
 
     return dZ
 
-def linear_backward_activation(dA, cache,L):
+def linear_backward_activation(dA, cache):
 
     backward_cache = {}
-
-    dZ = sigmoid_backward(dA, activation_cache)
-    dA, dW, db = linear_backward(dZ, linear_cache)
+    L = len(cache) // 2
 
 
-    for i in reversed(range(0, L-1)):
+    dZ = sigmoid_backward(dA, cache['activation_cache'+str(L)])
+    dA, dW, db = linear_backward(dZ, cache['linear_cache'+str(L)])
+
+    backward_cache['dZ'+str(L)] = dZ
+    backward_cache['dA'+str(L)] = dA
+    backward_cache['dW'+str(L)] = dW
+    backward_cache['db'+str(L)] = db
+
+    for i in reversed(range(1, L)):
         activation_cache = cache['activation_cache'+str(i)]
         linear_cache = cache['linear_cache'+str(i)]
+        print(activation_cache)
         dZ = relu_backward(dA, activation_cache)
         dA, dW, db = linear_backward(dZ, linear_cache)
 
@@ -118,6 +129,43 @@ def linear_backward_activation(dA, cache,L):
         backward_cache['dA'+str(i)] = dA
         backward_cache['dW'+str(i)] = dW
         backward_cache['db'+str(i)] = db
+
+    return backward_cache
+
+
+def update_parameters(parameters, backward_cache, learning_rate):
+
+    for i in range(1, len(parameters)//2):
+
+        parameters['W' +str(i)] = parameters['W' +str(i)] - learning_rate * backward_cache['dW'+str(i)]
+        parameters['b' + str(i)] = parameters['b' +str(i)] - learning_rate * backward_cache['db'+str(i)]
+
+
+    return parameters
+
+
+def model(train_set_picture, train_set_label, layers_size, num_itterations, learning_rate):
+
+    costs = []
+    parameters = initialize_parameters(layers_size)
+
+    for i in range(0,num_itterations):
+
+        AL, forward_cache = linear_forward_activation(train_set_picture, parameters)
+        cost = compute_cost(AL, train_set_label)
+
+        dA = -(np.divide(train_set_label, AL) - np.divide(1-train_set_label, 1-AL))
+        backward_cache = linear_backward_activation(dA, forward_cache)
+
+
+        parameters = update_parameters(parameters, backward_cache, learning_rate)
+
+        if i % 100 == 0:
+            print(f"Cost after {i} itterations : {cost}")
+            costs.append(cost)
+
+
+
 
 
 
@@ -131,7 +179,13 @@ def linear_backward_activation(dA, cache,L):
 
 
 if __name__ == '__main__':
-    train_set_image, train_set_label, test_set_image, test_set_label = load_dataset()
-    train_set_image = reshape(train_set_image)
-    test_set_image = reshape(test_set_image)
+    train_set_picture, train_set_label, test_set_picture, test_set_label, classes = load_dataset()
+
+    train_set_picture = reshape(train_set_picture)
+    test_set_picture = reshape(test_set_picture)
+
+    layers_dims = [train_set_picture.shape[0], 20, 7, 5 , 1]
+
+    model(train_set_picture, train_set_label, layers_dims, 401, 0.0075)
+
 
