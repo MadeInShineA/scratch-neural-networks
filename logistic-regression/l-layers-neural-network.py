@@ -100,6 +100,32 @@ def relu_backward(dA, cache):
 
     return dZ
 
+def linear_backward_activation(dA, cache,L):
+
+    backward_cache = {}
+
+    dZ = sigmoid_backward(dA, activation_cache)
+    dA, dW, db = linear_backward(dZ, linear_cache)
+
+
+    for i in reversed(range(0, L-1)):
+        activation_cache = cache['activation_cache'+str(i)]
+        linear_cache = cache['linear_cache'+str(i)]
+        dZ = relu_backward(dA, activation_cache)
+        dA, dW, db = linear_backward(dZ, linear_cache)
+
+        backward_cache['dZ'+str(i)] = dZ
+        backward_cache['dA'+str(i)] = dA
+        backward_cache['dW'+str(i)] = dW
+        backward_cache['db'+str(i)] = db
+
+
+
+
+
+
+
+
 
 
 
