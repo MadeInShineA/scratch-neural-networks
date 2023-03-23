@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from utils import *
 def initialize_parameters(x_size,hidden_size,output_size):
 
@@ -144,7 +145,7 @@ def model(train_set_picture, train_set_label, layers_dims, num_itterations, lear
             print(f"Cost after {i} itterations : {cost}")
             costs.append(cost)
 
-    return W1, b1, W2, b2
+    return W1, b1, W2, b2, costs
 
 
 if __name__ == '__main__':
@@ -155,9 +156,15 @@ if __name__ == '__main__':
 
     layers_dims = [train_set_picture.shape[0], 7, 1]
 
-    W1, b1, W2, b2 = model(train_set_picture, train_set_label, layers_dims, 2000, 0.005)
+    W1, b1, W2, b2, costs = model(train_set_picture, train_set_label, layers_dims, 2000, 0.005)
     predict(W1, b1, W2, b2, train_set_picture, train_set_label)
     predict(W1, b1, W2, b2, test_set_picture, test_set_label)
+
+    plt.plot(costs)
+    plt.ylabel('Cost')
+    plt.xlabel('Iterations (per hundreds)')
+    plt.title(f"Learning rate = {0.005}")
+    plt.show()
 
 
 

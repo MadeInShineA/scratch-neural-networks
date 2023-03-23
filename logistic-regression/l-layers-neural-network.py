@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from utils import *
 
 
@@ -34,7 +35,6 @@ def sigmoid(Z):
 def relu(Z):
 
     A = np.maximum(0, Z)
-
     cache = Z
 
     return A, cache
@@ -142,34 +142,25 @@ def update_parameters(parameters, backward_cache, learning_rate):
     return parameters
 
 
-def model(train_set_picture, train_set_label, layers_size, num_itterations, learning_rate):
+def model(train_set_picture, train_set_label, layers_size, num_iterations, learning_rate):
 
     costs = []
     parameters = initialize_parameters(layers_size)
 
-    for i in range(0,num_itterations):
+    for i in range(num_iterations):
 
         AL, forward_cache = linear_activation_forward(train_set_picture, parameters)
         cost = compute_cost(AL, train_set_label)
 
-        dAL = -(np.divide(train_set_label, AL) - np.divide(1-train_set_label, 1-AL))
+        dAL = -(np.divide(train_set_label, AL) - np.divide(1 - train_set_label, 1 - AL))
         backward_cache = linear_activation_backward(dAL, forward_cache)
         parameters = update_parameters(parameters, backward_cache, learning_rate)
 
         if i % 100 == 0:
-            print(f"Cost after {i} itterations : {cost}")
+            print(f"Cost after {i} iterations: {cost}")
             costs.append(cost)
 
-
-
-
-
-
-
-
-
-
-
+    return parameters, costs
 
 
 
@@ -182,6 +173,13 @@ if __name__ == '__main__':
 
     layers_dims = [train_set_picture.shape[0], 20, 7, 5 , 1]
 
-    model(train_set_picture, train_set_label, layers_dims, 2, 0.0075)
+    parameters, costs = model(train_set_picture, train_set_label, layers_dims, 2000, 0.0075)
+
+    plt.plot(costs)
+    plt.ylabel('Cost')
+    plt.xlabel('Iterations (per hundreds)')
+    plt.title(f"Learning rate = {0.0075}")
+    plt.show()
+
 
 
