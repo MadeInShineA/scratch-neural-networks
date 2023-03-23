@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 from utils import *
 
 
-def initialize_parameters(layers_size):
+def initialize_parameters(layers_sizes):
 
     parameters = {}
-    for i in range(1,len(layers_size)):
-        W = np.random.randn(layers_size[i],layers_size[i - 1]) * 0.01
-        b = np.zeros((layers_size[i], 1))
+    for i in range(1,len(layers_sizes)):
+        W = np.random.randn(layers_sizes[i],layers_sizes[i - 1]) * 0.01
+        b = np.zeros((layers_sizes[i], 1))
 
         parameters['W'+str(i)] = W
         parameters['b'+str(i)] = b
@@ -163,6 +163,20 @@ def model(train_set_picture, train_set_label, layers_size, num_iterations, learn
     return parameters, costs
 
 
+def predict(X, Y, parameters):
+
+
+    AL, forward_cache = linear_activation_forward(X, parameters)
+    Y_prediction = np.zeros((1, Y.shape[1]))
+
+    for i in range(Y.shape[1]):
+        if AL[0, i] > 0.5:
+            Y_prediction[0, i] = 1
+        else:
+            Y_prediction[0, i] = 0
+
+    print("Accuracy: " + str(np.sum((Y_prediction == Y) / Y.shape[1])))
+
 
 
 if __name__ == '__main__':
@@ -173,13 +187,15 @@ if __name__ == '__main__':
 
     layers_dims = [train_set_picture.shape[0], 20, 7, 5 , 1]
 
-    parameters, costs = model(train_set_picture, train_set_label, layers_dims, 2000, 0.0075)
+    parameters, costs = model(train_set_picture, train_set_label, layers_dims, 20000, 0.075)
 
     plt.plot(costs)
     plt.ylabel('Cost')
     plt.xlabel('Iterations (per hundreds)')
-    plt.title(f"Learning rate = {0.0075}")
+    plt.title(f"Learning rate = {0.075}")
     plt.show()
+
+    predict(test_set_picture, test_set_label, parameters)
 
 
 
