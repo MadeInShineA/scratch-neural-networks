@@ -40,7 +40,8 @@ def relu(Z):
     return A, cache
 
 
-def linear_forward_activation(X, parameters):
+
+def linear_activation_forward(X, parameters):
 
     forward_cache = {}
     A = X
@@ -52,9 +53,6 @@ def linear_forward_activation(X, parameters):
 
         forward_cache['linear_cache'+str(i)] = linear_cache
         forward_cache['activation_cache' + str(i)] = activation_cache
-        #cache['Z'+str(i)] = Z
-        #forward_cache['A' + str(i)] = A
-
 
     ZL, linear_cache = linear_forward(A, parameters['W'+str(L)], parameters['b'+str(L)])
     AL, activation_cache = sigmoid(ZL)
@@ -78,7 +76,7 @@ def compute_cost(AL, Y):
 def linear_backward(dZ, cache):
 
     previous_A, W, b = cache
-    m = np.shape(previous_A)[1]
+    m = previous_A.shape[1]
 
     dW = 1 / m * np.dot(dZ, previous_A.T)
     db = 1 / m * np.sum(dZ, axis=1, keepdims=True)
@@ -104,9 +102,10 @@ def relu_backward(dA, cache):
 
     return dZ
 
-def linear_backward_activation(dA, cache):
+def linear_activation_backward(dAL, cache):
 
     backward_cache = {}
+    dA = dAL
     L = len(cache) // 2
 
 
@@ -121,7 +120,6 @@ def linear_backward_activation(dA, cache):
     for i in reversed(range(1, L)):
         activation_cache = cache['activation_cache'+str(i)]
         linear_cache = cache['linear_cache'+str(i)]
-        print(activation_cache)
         dZ = relu_backward(dA, activation_cache)
         dA, dW, db = linear_backward(dZ, linear_cache)
 
@@ -151,13 +149,11 @@ def model(train_set_picture, train_set_label, layers_size, num_itterations, lear
 
     for i in range(0,num_itterations):
 
-        AL, forward_cache = linear_forward_activation(train_set_picture, parameters)
+        AL, forward_cache = linear_activation_forward(train_set_picture, parameters)
         cost = compute_cost(AL, train_set_label)
 
-        dA = -(np.divide(train_set_label, AL) - np.divide(1-train_set_label, 1-AL))
-        backward_cache = linear_backward_activation(dA, forward_cache)
-
-
+        dAL = -(np.divide(train_set_label, AL) - np.divide(1-train_set_label, 1-AL))
+        backward_cache = linear_activation_backward(dAL, forward_cache)
         parameters = update_parameters(parameters, backward_cache, learning_rate)
 
         if i % 100 == 0:
@@ -186,6 +182,6 @@ if __name__ == '__main__':
 
     layers_dims = [train_set_picture.shape[0], 20, 7, 5 , 1]
 
-    model(train_set_picture, train_set_label, layers_dims, 401, 0.0075)
+    model(train_set_picture, train_set_label, layers_dims, 2, 0.0075)
 
 
