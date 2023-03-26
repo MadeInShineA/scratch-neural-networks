@@ -112,8 +112,8 @@ def linear_activation_backward(dAL, cache):
     dZ = sigmoid_backward(dA, cache['activation_cache'+str(L)])
     dA, dW, db = linear_backward(dZ, cache['linear_cache'+str(L)])
 
-    backward_cache['dZ'+str(L)] = dZ
-    backward_cache['dA'+str(L)] = dA
+    # backward_cache['dZ'+str(L)] = dZ
+    # backward_cache['dA'+str(L-1)] = dA
     backward_cache['dW'+str(L)] = dW
     backward_cache['db'+str(L)] = db
 
@@ -122,9 +122,9 @@ def linear_activation_backward(dAL, cache):
         linear_cache = cache['linear_cache'+str(i)]
         dZ = relu_backward(dA, activation_cache)
         dA, dW, db = linear_backward(dZ, linear_cache)
-
-        backward_cache['dZ'+str(i)] = dZ
-        backward_cache['dA'+str(i)] = dA
+        #
+        # backward_cache['dZ'+str(i)] = dZ
+        # backward_cache['dA'+str(i-1)] = dA
         backward_cache['dW'+str(i)] = dW
         backward_cache['db'+str(i)] = db
 
@@ -132,12 +132,11 @@ def linear_activation_backward(dAL, cache):
 
 
 def update_parameters(parameters, backward_cache, learning_rate):
+    L = len(parameters)// 2
 
-    for i in range(1, len(parameters)//2):
-
+    for i in range(1, L+1):
         parameters['W' +str(i)] = parameters['W' +str(i)] - learning_rate * backward_cache['dW'+str(i)]
         parameters['b' + str(i)] = parameters['b' +str(i)] - learning_rate * backward_cache['db'+str(i)]
-
 
     return parameters
 
@@ -156,9 +155,9 @@ def model(train_set_picture, train_set_label, layers_size, num_iterations, learn
         backward_cache = linear_activation_backward(dAL, forward_cache)
         parameters = update_parameters(parameters, backward_cache, learning_rate)
 
-        if i % 100 == 0:
-            print(f"Cost after {i} iterations: {cost}")
-            costs.append(cost)
+        # if i % 100 == 0:
+        print(f"Cost after {i+1} iterations: {cost}")
+        costs.append(cost)
 
     return parameters, costs
 
@@ -187,14 +186,15 @@ if __name__ == '__main__':
 
     layers_dims = [train_set_picture.shape[0], 20, 7, 5 , 1]
 
-    parameters, costs = model(train_set_picture, train_set_label, layers_dims, 20000, 0.075)
+    parameters, costs = model(train_set_picture, train_set_label, layers_dims, 200, 0.075)
 
-    plt.plot(costs)
-    plt.ylabel('Cost')
-    plt.xlabel('Iterations (per hundreds)')
-    plt.title(f"Learning rate = {0.075}")
-    plt.show()
+    # plt.plot(costs)
+    # plt.ylabel('Cost')
+    # plt.xlabel('Iterations (per hundreds)')
+    # plt.title(f"Learning rate = {0.075}")
+    # plt.show()
 
+    predict(train_set_picture, train_set_label, parameters)
     predict(test_set_picture, test_set_label, parameters)
 
 
