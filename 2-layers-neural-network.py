@@ -120,7 +120,8 @@ def predict (W1, b1, W2, b2, X, Y):
         else:
             Y_prediction[0, i] = 0
 
-    print("Accuracy: " + str(np.sum((Y_prediction == Y) / Y.shape[1])))
+    accuracy = str(np.sum((Y_prediction == Y) / Y.shape[1]))
+    return accuracy
 
 
 def model(train_set_picture, train_set_label, layers_dims, num_itterations, learning_rate):
@@ -143,7 +144,7 @@ def model(train_set_picture, train_set_label, layers_dims, num_itterations, lear
 
         if i % 100 == 0:
             print(f"Cost after {i} itterations : {cost}")
-            costs.append(cost)
+        costs.append(cost)
 
     return W1, b1, W2, b2, costs
 
@@ -155,15 +156,16 @@ if __name__ == '__main__':
     test_set_picture = reshape(test_set_picture)
 
     layers_dims = [train_set_picture.shape[0], 7, 1]
+    learning_rate = 0.005
 
-    W1, b1, W2, b2, costs = model(train_set_picture, train_set_label, layers_dims, 2000, 0.005)
-    predict(W1, b1, W2, b2, train_set_picture, train_set_label)
-    predict(W1, b1, W2, b2, test_set_picture, test_set_label)
+    W1, b1, W2, b2, costs = model(train_set_picture, train_set_label, layers_dims, 2000, learning_rate)
+    train_accuracy = predict(W1, b1, W2, b2, train_set_picture, train_set_label)
+    test_accuracy = predict(W1, b1, W2, b2, test_set_picture, test_set_label)
 
     plt.plot(costs)
     plt.ylabel('Cost')
-    plt.xlabel('Iterations (per hundreds)')
-    plt.title(f"Learning rate = {0.005}")
+    plt.xlabel('Iterations')
+    plt.title(f"Learning rate = {learning_rate}\n Layers dims = {layers_dims} Test accuracy : {test_accuracy}")
     plt.show()
 
 

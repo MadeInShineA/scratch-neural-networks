@@ -46,7 +46,9 @@ Activation functions
 
 - Train accuracy: 96.17224880382773 %
 - Test accuracy: 74.0 %
+- Graph
 
+<img src="graphs/2_layers_neural_network.png" alt="2 layers neural network graph" width="320" height="240">
 
 ### Remarks
 This model is clearly over-fitting and seems to be pretty inconsistent
@@ -71,9 +73,11 @@ Activation functions
 
 - Train accuracy : 99.999999999999 %
 - Test accuracy: 82.0 %
+- Graph
 
-- <img src="graphs/3_layers_neural_network.png" alt="3 layers neural network graph" width="320" height="240">
-
+<img src="graphs/3_layers_neural_network.png" alt="3 layers neural network graph" width="320" height="240">
 
 ### Remarks
 This model is clearly over-fitting
+
+The number of layers and their dimensions can be changed easily with the layers_dims array
