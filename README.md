@@ -50,3 +50,30 @@ Activation functions
 
 ### Remarks
 This model is clearly over-fitting and seems to be pretty inconsistent
+
+## 3 Layers Neural Network
+
+It's a 3 layers neural network with twice 35 hidden units
+
+### Hyper parameters
+
+Learning rate 
+- 0.001
+
+Number of iterations 
+- 4500
+
+Activation functions
+- Relu
+- Sigmoid
+
+### Results
+
+- Train accuracy : 99.999999999999 %
+- Test accuracy: 82.0 %
+
+<img src="graphs/3_layers_neural_network.png" alt="3 layers neural network graph" width="640" height="480">
+
+
+### Remarks
+This model is clearly over-fitting

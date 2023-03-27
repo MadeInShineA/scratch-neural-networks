@@ -7,7 +7,7 @@ def initialize_parameters(layers_sizes):
 
     parameters = {}
     for i in range(1,len(layers_sizes)):
-        W = np.random.randn(layers_sizes[i],layers_sizes[i - 1]) * 0.01
+        W = np.random.randn(layers_sizes[i],layers_sizes[i - 1]) * np.sqrt(2 / layers_sizes[i-1])
         b = np.zeros((layers_sizes[i], 1))
 
         parameters['W'+str(i)] = W
@@ -109,11 +109,10 @@ def linear_activation_backward(dAL, cache):
     L = len(cache) // 2
 
 
+
     dZ = sigmoid_backward(dA, cache['activation_cache'+str(L)])
     dA, dW, db = linear_backward(dZ, cache['linear_cache'+str(L)])
 
-    # backward_cache['dZ'+str(L)] = dZ
-    # backward_cache['dA'+str(L-1)] = dA
     backward_cache['dW'+str(L)] = dW
     backward_cache['db'+str(L)] = db
 
@@ -122,9 +121,7 @@ def linear_activation_backward(dAL, cache):
         linear_cache = cache['linear_cache'+str(i)]
         dZ = relu_backward(dA, activation_cache)
         dA, dW, db = linear_backward(dZ, linear_cache)
-        #
-        # backward_cache['dZ'+str(i)] = dZ
-        # backward_cache['dA'+str(i-1)] = dA
+
         backward_cache['dW'+str(i)] = dW
         backward_cache['db'+str(i)] = db
 
@@ -133,6 +130,9 @@ def linear_activation_backward(dAL, cache):
 
 def update_parameters(parameters, backward_cache, learning_rate):
     L = len(parameters)// 2
+
+    parameters = parameters.copy()
+
 
     for i in range(1, L+1):
         parameters['W' +str(i)] = parameters['W' +str(i)] - learning_rate * backward_cache['dW'+str(i)]
@@ -155,8 +155,12 @@ def model(train_set_picture, train_set_label, layers_size, num_iterations, learn
         backward_cache = linear_activation_backward(dAL, forward_cache)
         parameters = update_parameters(parameters, backward_cache, learning_rate)
 
-        # if i % 100 == 0:
-        print(f"Cost after {i+1} iterations: {cost}")
+        if i % 100 == 0:
+            if i == 0:
+                print(f"Cost after {i+1} iterations: {cost}")
+            else:
+                print(f"Cost after {i} iterations: {cost}")
+
         costs.append(cost)
 
     return parameters, costs
@@ -174,7 +178,10 @@ def predict(X, Y, parameters):
         else:
             Y_prediction[0, i] = 0
 
-    print("Accuracy: " + str(np.sum((Y_prediction == Y) / Y.shape[1])))
+    accuracy = str(np.sum((Y_prediction == Y) / Y.shape[1]))
+
+    return accuracy
+
 
 
 
@@ -184,18 +191,24 @@ if __name__ == '__main__':
     train_set_picture = reshape(train_set_picture)
     test_set_picture = reshape(test_set_picture)
 
-    layers_dims = [train_set_picture.shape[0], 20, 7, 5 , 1]
+    layers_dims = [12288, 35, 35, 1]
+    number_iterations = 4500
+    learning_rate = 0.001
 
-    parameters, costs = model(train_set_picture, train_set_label, layers_dims, 200, 0.075)
+    parameters, costs = model(train_set_picture, train_set_label, layers_dims, number_iterations, learning_rate)
 
-    # plt.plot(costs)
-    # plt.ylabel('Cost')
-    # plt.xlabel('Iterations (per hundreds)')
-    # plt.title(f"Learning rate = {0.075}")
-    # plt.show()
+    train_accuracy = predict(train_set_picture, train_set_label, parameters)
+    test_accuracy = predict(test_set_picture, test_set_label, parameters)
 
-    predict(train_set_picture, train_set_label, parameters)
-    predict(test_set_picture, test_set_label, parameters)
+    print(f"Train accuracy : {train_accuracy}")
+    print(f"Test accuracy : {test_accuracy}")
+
+    plt.plot(costs)
+    plt.ylabel('Cost')
+    plt.xlabel('Iterations')
+    plt.title(f"Learning rate = {learning_rate}\n Layers dims = {layers_dims} Test accuracy : {test_accuracy}")
+    plt.show()
+
 
 
 
