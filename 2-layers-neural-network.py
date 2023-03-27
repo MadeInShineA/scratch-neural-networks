@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from utils import *
 def initialize_parameters(x_size,hidden_size,output_size):

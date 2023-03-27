@@ -1,4 +1,3 @@
-import numpy as np
 from utils import *
 def sigmoid(z):
     return 1/(1+np.exp(-z))
