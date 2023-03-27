@@ -72,7 +72,7 @@ Activation functions
 - Train accuracy : 99.999999999999 %
 - Test accuracy: 82.0 %
 
-<img src="graphs/3_layers_neural_network.png" alt="3 layers neural network graph" width="640" height="480">
+- <img src="graphs/3_layers_neural_network.png" alt="3 layers neural network graph" width="320" height="240">
 
 
 ### Remarks
