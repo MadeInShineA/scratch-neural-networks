@@ -1,6 +1,6 @@
 # Scratch-neural-networks
 
-This repository contains only neural networks made exclusively with np and h5py
+This repository contains different neural networks made exclusively with np and h5py
 
 ## Logistic regression model 
 
