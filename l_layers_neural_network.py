@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import numpy as np
+
 from utils import *
 
 
@@ -13,7 +15,6 @@ def initialize_parameters(layers_sizes):
         parameters['b'+str(i)] = b
 
     return parameters
-
 
 def linear_forward(A, W, b):
 

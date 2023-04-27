@@ -55,7 +55,7 @@ This model is clearly over-fitting and seems to be pretty inconsistent
 
 ## 3 Layers Neural Network
 
-It's a 3 layers neural network with twice 35 hidden units
+It's a 3 layers neural network with two 35 hidden units layers
 
 ### Hyper parameters
 
