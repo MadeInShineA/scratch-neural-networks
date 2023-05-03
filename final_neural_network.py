@@ -69,5 +69,30 @@ def relu(Z):
 
     return A, cache
 
-def forward_propagation(X, parameters):
-    pass
+def forward_propagation(X, parameters, gamma, beta, epsilon=0.999):
+
+    forward_cache = {}
+    A = X
+    L = len(parameters)
+
+    for i in range(1, L):
+        Z_tilde, linear_cache = linear_forward(A, parameters['W' + str(i)], gamma, beta, epsilon)
+        A, activation_cache= relu(Z_tilde)
+
+        forward_cache['linear_cache' + str(i)] = linear_cache
+        forward_cache['activation_cache' + str(i)] = activation_cache
+
+    ZL, linear_cache = linear_forward(A, parameters['W' + str(L)], gamma, beta, epsilon)
+    AL, activation_cache = sigmoid(ZL)
+
+    forward_cache['linear_cache' + str(L)] = linear_cache
+    forward_cache['activation_cache' + str(L)] = activation_cache
+
+    return AL, forward_cache
+
+def compute_cost(AL, Y):
+
+    m = Y.shape[1]
+    cost = -1/m * np.sum(Y * np.log(AL) + (1-Y) * np.log(1 - AL))
+
+    return cost

@@ -60,15 +60,12 @@ def linear_activation_forward(X, parameters):
     forward_cache['linear_cache'+str(L)] = linear_cache
     forward_cache['activation_cache'+str(L)] = activation_cache
 
-
     return AL, forward_cache
 
 def compute_cost(AL, Y):
 
     m = Y.shape[1]
     cost = -1/m * np.sum(Y * np.log(AL) + (1-Y) * np.log(1 - AL))
-
-    # cost = np.squeeze(cost)
 
     return cost
 
